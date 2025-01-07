@@ -4,19 +4,36 @@ import { FaChevronRight } from "react-icons/fa";
 import { TypeAnimation } from "react-type-animation";
 import styled from "styled-components";
 
+// const TerminalContainer = styled.div`
+//   background: ${(props) => (props.theme === "dark" ? "#1e1e1e" : "#f9f9f9")};
+//   color: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
+//   width: 80%;
+//   height: 70vh;
+//   margin: 50px auto;
+//   padding: 20px;
+//   font-family: "Courier New", Courier, monospace;
+//   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+//   border-radius: 10px;
+//   display: flex;
+//   flex-direction: column;
+// `;
 const TerminalContainer = styled.div`
   background: ${(props) => (props.theme === "dark" ? "#1e1e1e" : "#f9f9f9")};
   color: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
   width: 80%;
   height: 70vh;
-  margin: 50px auto;
+  margin: 0 auto; /* Removed 50px margin to center vertically */
   padding: 20px;
   font-family: "Courier New", Courier, monospace;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 `;
+
 
 const TerminalHeader = styled.div`
   background: ${(props) => (props.theme === "dark" ? "#2c2c2c" : "#ddd")};
