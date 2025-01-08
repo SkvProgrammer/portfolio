@@ -4,22 +4,10 @@ import { FaChevronRight } from "react-icons/fa";
 import { TypeAnimation } from "react-type-animation";
 import styled from "styled-components";
 
-// const TerminalContainer = styled.div`
-//   background: ${(props) => (props.theme === "dark" ? "#1e1e1e" : "#f9f9f9")};
-//   color: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
-//   width: 80%;
-//   height: 70vh;
-//   margin: 50px auto;
-//   padding: 20px;
-//   font-family: "Courier New", Courier, monospace;
-//   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-//   border-radius: 10px;
-//   display: flex;
-//   flex-direction: column;
-// `;
+
 const TerminalContainer = styled.div`
   background: ${(props) => (props.theme === "dark" ? "#1e1e1e" : "#f9f9f9")};
-  color: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
+  color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
   width: 80%;
   height: 70vh;
   margin: 0 auto; /* Removed 50px margin to center vertically */
@@ -67,7 +55,7 @@ const Menu = styled.div`
 
   a {
     text-decoration: none;
-    color: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
+    color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
     font-weight: bold;
     transition: color 0.3s;
 
@@ -79,7 +67,7 @@ const Menu = styled.div`
 
 const LogoContainer = styled.div`
   text-align: center;
-  color: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
+  color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
   font-size: 16px;
   font-weight: bold;
 `;
@@ -97,7 +85,7 @@ const Line = styled.div`
 `;
 
 const Cursor = styled.span`
-  background: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
+  background: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
   width: 8px;
   height: 16px;
   display: inline-block;
@@ -114,8 +102,8 @@ const Cursor = styled.span`
 
 const ThemeToggle = styled.button`
   background: none;
-  border: 1px solid ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
-  color: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
+  border: 1px solid ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
+  color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
@@ -123,7 +111,7 @@ const ThemeToggle = styled.button`
   transition: all 0.3s;
 
   &:hover {
-    background: ${(props) => (props.theme === "dark" ? "#00ff00" : "#333")};
+    background: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
     color: ${(props) => (props.theme === "dark" ? "#000" : "#fff")};
   }
 `;
@@ -288,7 +276,7 @@ const Terminal = () => {
           onKeyDown={handleCommand}
           style={{
             background: "transparent",
-            color: theme === "dark" ? "#00ff00" : "#333",
+            color: theme === "dark" ? "#ff0000" : "#333",
             border: "none",
             outline: "none",
             fontWeight: "bolder",
