@@ -218,7 +218,7 @@ const Terminal = () => {
           <span color="#27c93f" />
         </HeaderButtons>
         <Menu theme={theme}>
-        <a href="https://linktr.ee/skvprogrammer" target="_blank" rel="noopener noreferrer">SATYAM KUMAR VERMAN - I like to work with tech</a>
+        <a href="https://linktr.ee/skvprogrammer" target="_blank" rel="noopener noreferrer">SATYAM KUMAR VERMAN - I love to build cool stuffs 😉</a>
           <a href="https://github.com/skvprogrammer" target="_blank" rel="noopener noreferrer"> | <b>GitHub</b> |</a>
           <a href="https://linktr.ee/skvprogrammer" target="_blank" rel="noopener noreferrer"> | <b>Linktree</b> |</a>
          
