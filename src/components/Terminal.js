@@ -9,7 +9,7 @@ const TerminalContainer = styled.div`
   background: ${(props) => (props.theme === "dark" ? "#1e1e1e" : "#f9f9f9")};
   color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
   width: 90%;
-  height: 90vh;
+  height: 80vh;
   margin: 0 auto; /* Removed 50px margin to center vertically */
   padding: 20px;
   font-family: "Courier New", Courier, monospace;
@@ -18,7 +18,7 @@ const TerminalContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  top: 50%;
+  top: 45%;
   transform: translateY(-50%);
 `;
 
