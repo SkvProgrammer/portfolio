@@ -9,7 +9,7 @@ const TerminalContainer = styled.div`
   background: ${(props) => (props.theme === "dark" ? "#1e1e1e" : "#f9f9f9")};
   color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
   width: 90%;
-  height: 80vh;
+  height: 90vh;
   margin: 0 auto; /* Removed 50px margin to center vertically */
   padding: 20px;
   font-family: "Courier New", Courier, monospace;
@@ -18,7 +18,7 @@ const TerminalContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  top: 45%;
+  top: 50%;
   transform: translateY(-50%);
 `;
 
@@ -213,7 +213,7 @@ const Terminal = () => {
   return (
     <TerminalContainer theme={theme}>
       <TerminalHeader theme={theme}>
-        <HeaderButtons>
+        {/* <HeaderButtons>
           <span color="#ff5f56" />
           <span color="#ffbd2e" />
           <span color="#27c93f" />
@@ -225,7 +225,7 @@ const Terminal = () => {
          
           <br></br>
         
-        </Menu>
+        </Menu> */}
         {/* <LogoContainer theme={theme}>
           <h6>Satyam Kumar Verman <sup>I love to work with tech</sup></h6>
         </LogoContainer> */}
@@ -258,12 +258,91 @@ const Terminal = () => {
   }}
 />
 
+<ul style={{
+  display: 'flex',
+  gap: '0.7rem',
+  listStyleType: 'none',
+  padding: 0,
+  margin: 0,
+  fontFamily: 'monospace',
+  fontSize: '0.8rem',
+  color: '#00ff00',
+}}>
+  <li>
+    <a 
+      href="https://omezle.fun"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        color: '#00ff00',
+        textDecoration: 'none',
+        transition: 'color 0.2s ease, text-shadow 0.3s ease',
+      }}
+      onMouseOver={e => {
+        e.currentTarget.style.textShadow = '0 0 5px #00ff00';
+        e.currentTarget.style.color = '#66ff66';
+      }}
+      onMouseOut={e => {
+        e.currentTarget.style.textShadow = 'none';
+        e.currentTarget.style.color = '#00ff00';
+      }}
+    >
+      Omezle
+    </a>
+  </li>
+  <li>
+    <a 
+      href="https://paskal.site"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        color: '#00ff00',
+        textDecoration: 'none',
+        transition: 'color 0.2s ease, text-shadow 0.3s ease',
+      }}
+      onMouseOver={e => {
+        e.currentTarget.style.textShadow = '0 0 5px #00ff00';
+        e.currentTarget.style.color = '#66ff66';
+      }}
+      onMouseOut={e => {
+        e.currentTarget.style.textShadow = 'none';
+        e.currentTarget.style.color = '#00ff00';
+      }}
+    >
+      Paskal
+    </a>
+  </li>
+
+  <li>
+    <a 
+      href="https://linktree.com/skvprogrammer"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        color: '#00ff00',
+        textDecoration: 'none',
+        transition: 'color 0.2s ease, text-shadow 0.3s ease',
+      }}
+      onMouseOver={e => {
+        e.currentTarget.style.textShadow = '0 0 5px #00ff00';
+        e.currentTarget.style.color = '#66ff66';
+      }}
+      onMouseOut={e => {
+        e.currentTarget.style.textShadow = 'none';
+        e.currentTarget.style.color = '#00ff00';
+      }}
+    >
+      Linktree
+    </a>
+  </li>
+</ul>
+
       </TerminalHeader>
       <TerminalBody>
         <h3>
           <TypeAnimation
             sequence={[
-              "Welcome to My Portfolio Terminal!",
+              "Satyam Kumar Verman!",
               2000,
               "Type 'help' to get started.",
               2000,
