@@ -8,8 +8,8 @@ import styled from "styled-components";
 const TerminalContainer = styled.div`
   background: ${(props) => (props.theme === "dark" ? "#1e1e1e" : "#f9f9f9")};
   color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-  width: 80%;
-  height: 70vh;
+  width: 90%;
+  height: 80vh;
   margin: 0 auto; /* Removed 50px margin to center vertically */
   padding: 20px;
   font-family: "Courier New", Courier, monospace;
@@ -18,7 +18,7 @@ const TerminalContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  top: 50%;
+  top: 45%;
   transform: translateY(-50%);
 `;
 
@@ -65,12 +65,6 @@ const Menu = styled.div`
   }
 `;
 
-const LogoContainer = styled.div`
-  text-align: center;
-  color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-  font-size: 16px;
-  font-weight: bold;
-`;
 
 const TerminalBody = styled.div`
   flex: 1;
@@ -124,14 +118,16 @@ const Terminal = () => {
   const handleCommand = (e) => {
     if (e.key === "Enter") {
       const newOutput = [...output];
-      switch (command.trim()) {
+      switch (command.trim().toLowerCase()) {
         case "about":
+          newOutput.length=0;
           newOutput.push(
             "I am a competitive programmer skilled in React, Node.js, and more.\n" +
             "I also explore machine learning, blockchain, and ethical hacking."
           );
           break;
         case "skills":
+          newOutput.length=0;
           newOutput.push(
             "Skills:\n" +
             "- Programming: C,C++, Python, JavaScript,Java,\n" +
@@ -142,6 +138,7 @@ const Terminal = () => {
           );
           break;
         case "projects":
+          newOutput.length=0;
           newOutput.push(
             "Projects:\n" +
             "- URL Shortner\n" +
@@ -153,6 +150,7 @@ const Terminal = () => {
           );
           break;
         case "hobbies":
+          newOutput.length=0;
           newOutput.push(
             "Hobbies:\n" +
             "- Solving competitive programming challenges\n" +
@@ -169,6 +167,7 @@ const Terminal = () => {
         //   );
         //   break;
         case "goals":
+          newOutput.length=0;
           newOutput.push(
             "Goals:\n" +
             "- Build scalable AI-based systems\n" +
@@ -177,6 +176,7 @@ const Terminal = () => {
           );
           break;
         case "contact":
+          newOutput.length=0;
           newOutput.push(
             "Contact Information:\n" +
             "- Email: satyamkumarverman@gmail.com\n" +
@@ -185,6 +185,7 @@ const Terminal = () => {
           );
           break;
         case "help":
+          newOutput.length=0;
           newOutput.push(
             "Available commands:\n" +
             "- about: Learn about me\n" +
@@ -218,7 +219,7 @@ const Terminal = () => {
           <span color="#27c93f" />
         </HeaderButtons>
         <Menu theme={theme}>
-        <a href="https://linktr.ee/skvprogrammer" target="_blank" rel="noopener noreferrer">SATYAM KUMAR VERMAN - I love to build cool stuffs 😉</a>
+        <a href="https://linktr.ee/skvprogrammer" target="_blank" rel="noopener noreferrer">SATYAM KUMAR VERMAN - I like to work with tech</a>
           <a href="https://github.com/skvprogrammer" target="_blank" rel="noopener noreferrer"> | <b>GitHub</b> |</a>
           <a href="https://linktr.ee/skvprogrammer" target="_blank" rel="noopener noreferrer"> | <b>Linktree</b> |</a>
          
@@ -234,6 +235,29 @@ const Terminal = () => {
         >
           {theme === "dark" ? "Light Mode" : "Dark Mode"}
         </ThemeToggle>
+        <img 
+  src="dev.png" 
+  alt="Developer Logo"
+  style={{
+    opacity: 0.8,
+    zIndex: 10,
+    height: "100px",
+    width: "200px",
+    filter: "drop-shadow(0 0 10px #00ffcc)",
+    transition: "transform 0.3s ease, filter 0.3s ease",
+    transform: "scale(1)",
+    borderRadius:"50px"
+  }}
+  onMouseOver={(e) => {
+    e.currentTarget.style.transform = "scale(1.05)";
+    e.currentTarget.style.filter = "drop-shadow(0 0 15px #00ffee)";
+  }}
+  onMouseOut={(e) => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.filter = "drop-shadow(0 0 10px #00ffcc)";
+  }}
+/>
+
       </TerminalHeader>
       <TerminalBody>
         <h3>
