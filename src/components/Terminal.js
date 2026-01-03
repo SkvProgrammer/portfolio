@@ -292,7 +292,7 @@ const Terminal = () => {
   </li>
   <li>
     <a 
-      href="https://paskal.site"
+      href="https://leetcode.com/u/skvprogrammer"
       target="_blank"
       rel="noopener noreferrer"
       style={{
@@ -309,10 +309,36 @@ const Terminal = () => {
         e.currentTarget.style.color = '#00ff00';
       }}
     >
-      Paskal
+      Leetcode
     </a>
   </li>
 
+
+  <li>
+    <a 
+      href="https://github.com/skvprogrammer"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        color: '#00ff00',
+        textDecoration: 'none',
+        transition: 'color 0.2s ease, text-shadow 0.3s ease',
+      }}
+      onMouseOver={e => {
+        e.currentTarget.style.textShadow = '0 0 5px #00ff00';
+        e.currentTarget.style.color = '#66ff66';
+      }}
+      onMouseOut={e => {
+        e.currentTarget.style.textShadow = 'none';
+        e.currentTarget.style.color = '#00ff00';
+      }}
+    >
+      GitHub
+    </a>
+  </li>
+
+
+        
   <li>
     <a 
       href="https://linktree.com/skvprogrammer"
