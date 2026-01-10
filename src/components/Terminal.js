@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FaChevronRight } from "react-icons/fa";
+import { FaSun, FaMoon,FaChevronRight } from "react-icons/fa";
 import { TypeAnimation } from "react-type-animation";
 import styled from "styled-components";
 
@@ -36,34 +36,34 @@ const TerminalHeader = styled.div`
   gap: 10px;
 `;
 
-const HeaderButtons = styled.div`
-  display: flex;
-  gap: 8px;
+// const HeaderButtons = styled.div`
+//   display: flex;
+//   gap: 8px;
 
-  span {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-    background: ${(props) => props.color};
-  }
-`;
+//   span {
+//     width: 12px;
+//     height: 12px;
+//     border-radius: 50%;
+//     display: inline-block;
+//     background: ${(props) => props.color};
+//   }
+// `;
 
-const Menu = styled.div`
-  display: flex;
-  gap: 20px;
+// const Menu = styled.div`
+//   display: flex;
+//   gap: 20px;
 
-  a {
-    text-decoration: none;
-    color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-    font-weight: bold;
-    transition: color 0.3s;
+//   a {
+//     text-decoration: none;
+//     color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
+//     font-weight: bold;
+//     transition: color 0.3s;
 
-    &:hover {
-      color: ${(props) => (props.theme === "dark" ? "#fff" : "#000")};
-    }
-  }
-`;
+//     &:hover {
+//       color: ${(props) => (props.theme === "dark" ? "#fff" : "#000")};
+//     }
+//   }
+// `;
 
 
 const TerminalBody = styled.div`
@@ -233,7 +233,7 @@ const Terminal = () => {
           theme={theme}
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
-          {theme === "dark" ? "Light Mode" : "Dark Mode"}
+          {theme === "dark" ? <FaSun /> : <FaMoon />}
         </ThemeToggle>
         <img 
   src="dev.png" 
