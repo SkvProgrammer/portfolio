@@ -98,8 +98,8 @@ const ThemeToggle = styled.button`
   background: none;
   border: 1px solid ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
   color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-  padding: 5px 10px;
-  border-radius: 5px;
+  padding: 10px 10px;
+  border-radius: 50%;
   cursor: pointer;
   font-size: 14px;
   transition: all 0.3s;
