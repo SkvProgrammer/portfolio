@@ -368,8 +368,8 @@ const Terminal = () => {
         <h3>
           <TypeAnimation
             sequence={[
-              "Satyam Kumar Verman!",
-              2000,
+              "Satyam Kumar Verman! - Portfolio Terminal",
+              3000,
               "Type 'help' to get started.",
               2000,
             ]}
