@@ -78,6 +78,13 @@ const Line = styled.div`
   gap: 10px;
 `;
 
+const Prompt = styled.span`
+  font-family: "Courier New", Courier, monospace;
+  color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#990000")};
+  font-weight: 700;
+  font-size: 0.95rem;
+`;
+
 const Cursor = styled.span`
   background: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
   width: 8px;
@@ -397,6 +404,7 @@ const Terminal = () => {
         </div>
       </TerminalBody>
       <Line>
+        <Prompt theme={theme}>root@kali</Prompt>
         <FaChevronRight />
         <input
           type="text"
