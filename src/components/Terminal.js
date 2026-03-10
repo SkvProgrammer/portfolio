@@ -277,7 +277,7 @@ const Terminal = () => {
 }}>
   <li>
     <a 
-      href="https://omezle.fun"
+      href="https://omezle.xyz"
       target="_blank"
       rel="noopener noreferrer"
       style={{
