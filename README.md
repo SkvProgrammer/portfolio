@@ -93,7 +93,7 @@ Type the following commands inside the terminal:
 * **GitHub**: [https://github.com/skvprogrammer](https://github.com/skvprogrammer)
 * **LeetCode**: [https://leetcode.com/u/skvprogrammer](https://leetcode.com/u/skvprogrammer)
 * **Linktree**: [https://linktr.ee/skvprogrammer](https://linktr.ee/skvprogrammer)
-* **Omezle**: [https://omezle.fun](https://omezle.fun)
+* **Omezle**: [https://omezle.xyz](https://omezle.xyz)
 
 ---
 
