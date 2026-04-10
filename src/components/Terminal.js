@@ -1,430 +1,449 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { FaSun, FaMoon,FaChevronRight } from "react-icons/fa";
-import { TypeAnimation } from "react-type-animation";
-import styled from "styled-components";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
+const THEMES = {
+  dark: {
+    bg: "#080b19",
+    headerBg: "#0d1126",
+    footerBg: "#0d1126",
+    text: "#c8ffd4",
+    accent: "#00ff88",
+    accentDim: "#00cc6a",
+    prompt: "#00bfff",
+    error: "#ff4d6d",
+    muted: "#445566",
+    border: "rgba(0,255,136,0.12)",
+    headerText: "#7effd4",
+    buttonBg: "rgba(0,255,136,0.08)",
+    buttonHover: "rgba(0,255,136,0.18)",
+    link: "#00e5ff",
+  },
+  light: {
+    bg: "#f4f6f0",
+    headerBg: "#e8ede2",
+    footerBg: "#e8ede2",
+    text: "#1a2e1a",
+    accent: "#1a7a40",
+    accentDim: "#2a9a55",
+    prompt: "#1a5a8a",
+    error: "#c0392b",
+    muted: "#7a8a7a",
+    border: "rgba(26,122,64,0.18)",
+    headerText: "#2a5a2a",
+    buttonBg: "rgba(26,122,64,0.07)",
+    buttonHover: "rgba(26,122,64,0.15)",
+    link: "#0a6aaa",
+  },
+};
 
-const TerminalContainer = styled.div`
-  background: ${(props) => (props.theme === "dark" ? "#1e1e1e" : "#f9f9f9")};
-  color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-  width: 90%;
-  height: 80vh;
-  margin: 0 auto; /* Removed 50px margin to center vertically */
-  padding: 20px;
-  font-family: "Courier New", Courier, monospace;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  top: 45%;
-  transform: translateY(-50%);
-`;
+// Line shapes:
+//   { text, color }                              — plain text
+//   { type:"link", prefix, label, url, color }   — clickable link
+//   { text: "" }                                  — blank spacer
+const COMMANDS = {
+  help: {
+    output: [
+      { text: "┌─ AVAILABLE COMMANDS ─────────────────────────────┐", color: "accent" },
+      { text: "│  help          Show this help menu                │", color: "text" },
+      { text: "│  about         About Satyam Kumar Verman          │", color: "text" },
+      { text: "│  skills        Technical skill set                │", color: "text" },
+      { text: "│  projects      Projects with live links           │", color: "text" },
+      { text: "│  links         All social & profile links         │", color: "text" },
+      { text: "│  achievements  Certs · contests · open source     │", color: "text" },
+      { text: "│  contact       Get in touch                       │", color: "text" },
+      { text: "│  clear         Clear terminal output              │", color: "text" },
+      { text: "│  theme         Toggle dark / light mode           │", color: "text" },
+      { text: "│  banner        Show ASCII banner                  │", color: "text" },
+      { text: "└───────────────────────────────────────────────────┘", color: "accent" },
+    ],
+  },
 
+  about: {
+    output: [
+      { text: "▸ SATYAM KUMAR VERMAN", color: "accent" },
+      { text: "  Full-Stack Developer · DSA · Open Source · AI-Augmented Dev", color: "text" },
+      { text: "", color: "text" },
+      { text: "  Self-taught developer with strong foundations in DS&A, OS,", color: "muted" },
+      { text: "  Networking & System Design. Built Omezle — a WebRTC platform", color: "muted" },
+      { text: "  handling 20K+ concurrent users. Active open-source contributor", color: "muted" },
+      { text: "  to freeCodeCamp & CPython. 500+ DSA problems solved.", color: "muted" },
+      { text: "", color: "text" },
+      { text: "  Status    →  Available for hire", color: "prompt" },
+      { text: "  Location  →  Ramgarh, Jharkhand, India", color: "prompt" },
+      { text: "  Phone     →  +91 6200872019", color: "prompt" },
+      { type: "link", prefix: "  Email     →  ", label: "satyamkumarverman@gmail.com", url: "mailto:satyamkumarverman@gmail.com", color: "prompt" },
+    ],
+  },
 
-const TerminalHeader = styled.div`
-  background: ${(props) => (props.theme === "dark" ? "#2c2c2c" : "#ddd")};
-  color: ${(props) => (props.theme === "dark" ? "#fff" : "#000")};
-  padding: 10px 20px;
-  font-size: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 10px 10px 0 0;
-  flex-direction: column;
-  gap: 10px;
-`;
+  skills: {
+    output: [
+      { text: "▸ TECHNICAL SKILLS", color: "accent" },
+      { text: "", color: "text" },
+      { text: "  Languages   Python · C++ · JavaScript · Java · C", color: "text" },
+      { text: "", color: "text" },
+      { text: "  Frontend    React.js · HTML5/CSS3 · ES6+ · WebSockets", color: "text" },
+      { text: "              WebRTC · RESTful API · Responsive Design", color: "text" },
+      { text: "", color: "text" },
+      { text: "  Backend     Node.js · Express.js · Flask · MongoDB", color: "text" },
+      { text: "              REST API · System Design (HLD + LLD)", color: "text" },
+      { text: "", color: "text" },
+      { text: "  DevOps      Linux (Ubuntu/CLI) · Git · Docker", color: "text" },
+      { text: "              Vercel · Render · Railway.app", color: "text" },
+      { text: "", color: "text" },
+      { text: "  CS Core     DSA · OS · Networking · DBMS · OOP", color: "text" },
+      { text: "              SDLC · Penetration Testing", color: "text" },
+      { text: "", color: "text" },
+      { text: "  AI Tools    ChatGPT · Google Gemini · Claude", color: "muted" },
+    ],
+  },
 
-// const HeaderButtons = styled.div`
-//   display: flex;
-//   gap: 8px;
+  projects: {
+    output: [
+      { text: "▸ PROJECTS", color: "accent" },
+      { text: "", color: "text" },
+      { text: "  [01] Omezle — Real-Time Random Chat Web App", color: "text" },
+      { text: "        MERN + WebRTC · 20K+ concurrent users · Socket.IO", color: "muted" },
+      { text: "        Matchmaking · rate limiting · moderation · microservices WIP", color: "muted" },
+      { type: "link", prefix: "        → Live: ", label: "omezle.xyz", url: "https://omezle.xyz", color: "accent" },
+      { text: "", color: "text" },
+      { text: "  [02] Terminal Theme Portfolio", color: "text" },
+      { text: "        You're inside it! Interactive terminal-based UI portfolio.", color: "muted" },
+      { text: "        Stack: React · Node.js · Express · MongoDB · Vercel", color: "muted" },
+      { text: "", color: "text" },
+      { text: "  [03] URL Shortener Web App", color: "text" },
+      { text: "        Flask REST API · long URLs → short slugs · minimal UI", color: "muted" },
+      { text: "        Stack: Python · Flask · REST API · Vercel", color: "muted" },
+      { text: "", color: "text" },
+      { text: "  [04] Pomodoro Timer Web App", color: "text" },
+      { text: "        Real-time WebSocket sync · session tracking · modern UI", color: "muted" },
+      { text: "        Stack: Python · Flask · WebSockets · Vercel", color: "muted" },
+    ],
+  },
 
-//   span {
-//     width: 12px;
-//     height: 12px;
-//     border-radius: 50%;
-//     display: inline-block;
-//     background: ${(props) => props.color};
-//   }
-// `;
+  links: {
+    output: [
+      { text: "▸ LINKS & PROFILES", color: "accent" },
+      { text: "", color: "text" },
+      { type: "link", prefix: "  ✉  Email      → ", label: "satyamkumarverman@gmail.com", url: "mailto:satyamkumarverman@gmail.com", color: "prompt" },
+      { type: "link", prefix: "  ⌥  GitHub     → ", label: "Github", url: "https://github.com/skvprogrammer", color: "accent" },
+      { type: "link", prefix: "  ◈  LinkedIn   → ", label: "LinkedIn", url: "https://www.linkedin.com/in/satyam-kumar-verman-b77272190/", color: "accent" },
+      { type: "link", prefix: "  ⚡  Portfolio  → ", label: "Live portfolio", url: "#", color: "accent" },
+      { type: "link", prefix: "  ⊞  LeetCode   → ", label: "Leetcode", url: "https://leetcode.com/u/skvprogrammer", color: "accentDim" },
+      { type: "link", prefix: "  ◉  Omezle     → ", label: "Omezle", url: "https://omezle.xyz", color: "accentDim" },
+      { text: "", color: "text" },
+      { text: "  → Open to full-time roles & collaborations.", color: "muted" },
+    ],
+  },
 
-// const Menu = styled.div`
-//   display: flex;
-//   gap: 20px;
+  achievements: {
+    output: [
+      { text: "▸ ACHIEVEMENTS & CERTIFICATIONS", color: "accent" },
+      { text: "", color: "text" },
+      { text: "  DSA", color: "accent" },
+      { text: "  ⬡  500+ problems solved on LeetCode & HackerRank", color: "text" },
+      { text: "  ⬡  LeetCode Rank #125  — Weekly Contest 477", color: "text" },
+      { text: "  ⬡  LeetCode Rank #453  — Biweekly Contest 170", color: "text" },
+      { text: "", color: "text" },
+      { text: "  Open Source", color: "accent" },
+      { type: "link", prefix: "  ⬡  freeCodeCamp → ", label: "4–5 PRs merged into main curriculum", url: "https://github.com/freeCodeCamp/freeCodeCamp", color: "text" },
+      { type: "link", prefix: "  ⬡  CPython      → ", label: "1 PR merged into official Python interpreter", url: "https://github.com/python/cpython", color: "text" },
+      { text: "", color: "text" },
+      { text: "  Certifications", color: "accent" },
+      { text: "  ⬡  C++ Programming — Beginner to Ultimate Level (Udemy)", color: "muted" },
+      { text: "  ⬡  Software Engineer Role Certification", color: "muted" },
+      { text: "  ⬡  Penetration Testing Certification", color: "muted" },
+      { text: "  ⬡  HackerRank — Java · Python · SQL", color: "muted" },
+    ],
+  },
 
-//   a {
-//     text-decoration: none;
-//     color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-//     font-weight: bold;
-//     transition: color 0.3s;
+  contact: {
+    output: [
+      { text: "▸ CONTACT SATYAM", color: "accent" },
+      { text: "", color: "text" },
+      { type: "link", prefix: "  ✉  ", label: "satyamkumarverman@gmail.com", url: "mailto:satyamkumarverman@gmail.com", color: "prompt" },
+      { text: "  ☎  +91 6200872019", color: "text" },
+      { type: "link", prefix: "  ⌥  GitHub   → ", label: "Github", url: "https://github.com/skvprogrammer", color: "accent" },
+      { type: "link", prefix: "  ◈  LinkedIn → ", label: "LinkedIn", url: "https://www.linkedin.com/in/satyam-kumar-verman-b77272190/", color: "accent" },
+      { text: "", color: "text" },
+      { text: "  → Open to full-time roles & collaborations.", color: "prompt" },
+    ],
+  },
 
-//     &:hover {
-//       color: ${(props) => (props.theme === "dark" ? "#fff" : "#000")};
-//     }
-//   }
-// `;
+  banner: {
+    output: [
+    { text: " ███████╗██╗  ██╗██╗   ██╗", color: "accent" },
+    { text: " ██╔════╝██║ ██╔╝██║   ██║", color: "accent" },
+    { text: " ███████╗█████╔╝ ██║   ██║", color: "accentDim" },
+    { text: " ╚════██║██╔═██╗ ╚██╗ ██╔╝", color: "accentDim" },
+    { text: " ███████║██║  ██╗ ╚████╔╝ ", color: "muted" },
+    { text: " ╚══════╝╚═╝  ╚═╝  ╚═══╝  ", color: "muted" },
+      { text: "", color: "text" },
+      { text: "  Full-Stack Dev  ·  DSA  ·  Open Source  ·  AI Dev", color: "prompt" },
+      { text: "  Type 'help' to explore  ·  Type 'links' for socials", color: "muted" },
+    ],
+  },
+};
 
+const BOOT_SEQUENCE = [
+  "Initializing system...",
+  "Loading profile: satyam@portfolio",
+  "Mounting filesystem...",
+  "Starting terminal session...",
+  "",
+  "Session ready. Type 'help' to get started.",
+];
 
-const TerminalBody = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  margin-top: 10px;
-`;
+function GlowCursor({ theme }) {
+  const t = THEMES[theme];
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        width: "9px",
+        height: "15px",
+        background: t.accent,
+        marginLeft: "2px",
+        verticalAlign: "middle",
+        borderRadius: "1px",
+        animation: "cursorBlink 1.1s step-end infinite",
+        boxShadow: `0 0 8px ${t.accent}`,
+        flexShrink: 0,
+      }}
+    />
+  );
+}
 
-const Line = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const Prompt = styled.span`
-  font-family: "Courier New", Courier, monospace;
-  color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#990000")};
-  font-weight: 700;
-  font-size: 0.95rem;
-`;
-
-const Cursor = styled.span`
-  background: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-  width: 8px;
-  height: 16px;
-  display: inline-block;
-  animation: blink 0.8s infinite;
-  @keyframes blink {
-    0%, 50% {
-      opacity: 1;
-    }
-    51%, 100% {
-      opacity: 0;
-    }
-  }
-`;
-
-const ThemeToggle = styled.button`
-  background: none;
-  border: 1px solid ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-  color: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-  padding: 10px 10px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s;
-
-  &:hover {
-    background: ${(props) => (props.theme === "dark" ? "#ff0000" : "#333")};
-    color: ${(props) => (props.theme === "dark" ? "#000" : "#fff")};
-  }
-`;
-
-const Terminal = () => {
-  const [command, setCommand] = useState("");
-  const [output, setOutput] = useState([]);
+export default function Terminal() {
   const [theme, setTheme] = useState("dark");
+  const [output, setOutput] = useState([]);
+  const [command, setCommand] = useState("");
+  const [history, setHistory] = useState([]);
+  const [historyIdx, setHistoryIdx] = useState(-1);
+  const [booted, setBooted] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const bodyRef = useRef(null);
+  const inputRef = useRef(null);
+  const t = THEMES[theme];
 
-  const handleCommand = (e) => {
-    if (e.key === "Enter") {
-      const newOutput = [...output];
-      switch (command.trim().toLowerCase()) {
-        case "about":
-          newOutput.length=0;
-          newOutput.push(
-            "I am a competitive programmer skilled in React, Node.js, and more.\n" +
-            "I also explore machine learning, blockchain, and ethical hacking."
-          );
-          break;
-        case "skills":
-          newOutput.length=0;
-          newOutput.push(
-            "Skills:\n" +
-            "- Programming: C,C++, Python, JavaScript,Java,\n" +
-            "- Machine Learning: TensorFlow, PyTorch\n" +
-            "- Web Dev: MERN , Flask , Django\n" +
-            "- Blockchain: Solidity, Ethereum\n" +
-            "- Ethical Hacking: Kali Linux, Metasploit"
-          );
-          break;
-        case "projects":
-          newOutput.length=0;
-          newOutput.push(
-            "Projects:\n" +
-            "- URL Shortner\n" +
-            "- Random Chat Web App\n" +
-            "- Personal Portfolio Terminal\n" +
-            "- Whiteboard Web App\n" +
-            "- Notes Web App\n"
-
-          );
-          break;
-        case "hobbies":
-          newOutput.length=0;
-          newOutput.push(
-            "Hobbies:\n" +
-            "- Solving competitive programming challenges\n" +
-            "- Ethical hacking\n" +
-            "- Exploring AI advancements"
-          );
-          break;
-        // case "achievements":
-        //   newOutput.push(
-        //     "Achievements:\n" +
-        //     "- B\n" +
-        //     "- Built a blockchain app with 100+ active users\n" +
-        //     "- Completed advanced ethical hacking certification"
-        //   );
-        //   break;
-        case "goals":
-          newOutput.length=0;
-          newOutput.push(
-            "Goals:\n" +
-            "- Build scalable AI-based systems\n" +
-            "- Contribute to open-source blockchain projects\n" +
-            "- Participate in global hackathons"
-          );
-          break;
-        case "contact":
-          newOutput.length=0;
-          newOutput.push(
-            "Contact Information:\n" +
-            "- Email: satyamkumarverman@gmail.com\n" +
-            "- GitHub: https://github.com/skvprogrammer\n" +
-            "- Linktree: https://linktr.ee/skvprogrammer"
-          );
-          break;
-        case "help":
-          newOutput.length=0;
-          newOutput.push(
-            "Available commands:\n" +
-            "- about: Learn about me\n" +
-            "- skills: See my skill set\n" +
-            "- projects: Explore my projects\n" +
-            "- hobbies: Know what I do for fun\n" +
-            "- achievements: See my accomplishments\n" +
-            "- goals: My future ambitions\n" +
-            "- contact: Get my contact info\n" +
-            "- clear: Clear the terminal"
-          );
-          break;
-        case "clear":
-          setOutput([]);
-          setCommand("");
-          return;
-        default:
-          newOutput.push(`'${command}' is not recognized as a command.`);
+  // Boot sequence then auto-show banner
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < BOOT_SEQUENCE.length) {
+        const idx = i;
+        const line = BOOT_SEQUENCE[idx];
+        setOutput((prev) => [
+          ...prev,
+          {
+            type: "boot",
+            text: line,
+            color: idx === BOOT_SEQUENCE.length - 1 ? "accent" : idx < 3 ? "prompt" : "muted",
+          },
+        ]);
+        i++;
+      } else {
+        clearInterval(interval);
+        setOutput((prev) => [...prev, { type: "out", lines: COMMANDS.banner.output }]);
+        setBooted(true);
+        setTimeout(() => inputRef.current?.focus(), 50);
       }
-      setOutput(newOutput);
-      setCommand("");
+    }, 150);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Auto-scroll
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: "smooth" });
+  }, [output]);
+
+  const resolveColor = useCallback(
+    (colorKey) => {
+      const map = {
+        accent: t.accent, accentDim: t.accentDim, text: t.text,
+        muted: t.muted, prompt: t.prompt, error: t.error, link: t.link,
+      };
+      return map[colorKey] || t.text;
+    },
+    [t]
+  );
+
+  const runCommand = useCallback((raw) => {
+    const cmd = raw.trim().toLowerCase();
+    if (!cmd) return;
+    setHistory((prev) => [raw, ...prev].slice(0, 50));
+    setHistoryIdx(-1);
+    setOutput((prev) => [...prev, { type: "cmd", text: raw }]);
+
+    if (cmd === "clear") { setOutput([]); return; }
+    if (cmd === "theme") {
+      setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+      setOutput((prev) => [...prev, { type: "out", lines: [{ text: "Theme toggled.", color: "accent" }] }]);
+      return;
+    }
+    const def = COMMANDS[cmd];
+    if (def) {
+      setOutput((prev) => [...prev, { type: "out", lines: def.output }]);
+    } else {
+      setOutput((prev) => [
+        ...prev,
+        { type: "out", lines: [
+          { text: `bash: ${raw}: command not found`, color: "error" },
+          { text: "Type 'help' to see available commands.", color: "muted" },
+        ]},
+      ]);
+    }
+  }, []);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") { runCommand(command); setCommand(""); }
+    else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const next = Math.min(historyIdx + 1, history.length - 1);
+      setHistoryIdx(next); setCommand(history[next] || "");
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const next = Math.max(historyIdx - 1, -1);
+      setHistoryIdx(next); setCommand(next === -1 ? "" : history[next] || "");
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      const cmds = Object.keys(COMMANDS).concat(["clear", "theme"]);
+      const match = cmds.find((c) => c.startsWith(command.toLowerCase()));
+      if (match) setCommand(match);
     }
   };
 
+  const renderLine = (l, j) => {
+    if (l.type !== "link" && (l.text === "" || l.text === undefined)) {
+      return <div key={j} style={{ height: "5px" }} />;
+    }
+    if (l.type === "link") {
+      return (
+        <div key={j} style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap" }}>
+          {l.prefix && <span style={{ color: resolveColor(l.color), whiteSpace: "pre" }}>{l.prefix}</span>}
+          <a
+            href={l.url}
+            target={l.url.startsWith("mailto") ? "_self" : "_blank"}
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            style={{ color: t.link, textDecoration: "underline", textDecorationStyle: "dotted", textUnderlineOffset: "3px", cursor: "pointer", transition: "color 0.15s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = t.accent)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = t.link)}
+          >
+            {l.label}
+          </a>
+        </div>
+      );
+    }
+    return (
+      <div key={j} style={{ color: resolveColor(l.color), whiteSpace: "pre-wrap" }}>
+        {l.text}
+      </div>
+    );
+  };
+
   return (
-    <TerminalContainer theme={theme}>
-      <TerminalHeader theme={theme}>
-        {/* <HeaderButtons>
-          <span color="#ff5f56" />
-          <span color="#ffbd2e" />
-          <span color="#27c93f" />
-        </HeaderButtons>
-        <Menu theme={theme}>
-        <a href="https://linktr.ee/skvprogrammer" target="_blank" rel="noopener noreferrer">SATYAM KUMAR VERMAN - I like to work with tech</a>
-          <a href="https://github.com/skvprogrammer" target="_blank" rel="noopener noreferrer"> | <b>GitHub</b> |</a>
-          <a href="https://linktr.ee/skvprogrammer" target="_blank" rel="noopener noreferrer"> | <b>Linktree</b> |</a>
-         
-          <br></br>
-        
-        </Menu> */}
-        {/* <LogoContainer theme={theme}>
-          <h6>Satyam Kumar Verman <sup>I love to work with tech</sup></h6>
-        </LogoContainer> */}
-        <ThemeToggle
-          theme={theme}
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        >
-          {theme === "dark" ? <FaSun /> : <FaMoon />}
-        </ThemeToggle>
-        <img 
-  src="dev.png" 
-  alt="Developer Logo"
-  style={{
-    opacity: 0.8,
-    zIndex: 10,
-    height: "100px",
-    width: "200px",
-    filter: "drop-shadow(0 0 10px #00ffcc)",
-    transition: "transform 0.3s ease, filter 0.3s ease",
-    transform: "scale(1)",
-    borderRadius:"50px"
-  }}
-  onMouseOver={(e) => {
-    e.currentTarget.style.transform = "scale(1.05)";
-    e.currentTarget.style.filter = "drop-shadow(0 0 15px #00ffee)";
-  }}
-  onMouseOut={(e) => {
-    e.currentTarget.style.transform = "scale(1)";
-    e.currentTarget.style.filter = "drop-shadow(0 0 10px #00ffcc)";
-  }}
-/>
+    <>
+      <style>{`
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body, #root { width: 100%; height: 100%; overflow: hidden; }
+        @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes fadeSlideIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: ${t.muted}55; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: ${t.accent}88; }
+      `}</style>
 
-<ul style={{
-  display: 'flex',
-  gap: '0.7rem',
-  listStyleType: 'none',
-  padding: 0,
-  margin: 0,
-  fontFamily: 'monospace',
-  fontSize: '0.8rem',
-  color: '#00ff00',
-}}>
-  <li>
-    <a 
-      href="https://omezle.xyz"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        color: '#00ff00',
-        textDecoration: 'none',
-        transition: 'color 0.2s ease, text-shadow 0.3s ease',
-      }}
-      onMouseOver={e => {
-        e.currentTarget.style.textShadow = '0 0 5px #00ff00';
-        e.currentTarget.style.color = '#66ff66';
-      }}
-      onMouseOut={e => {
-        e.currentTarget.style.textShadow = 'none';
-        e.currentTarget.style.color = '#00ff00';
-      }}
-    >
-      Omezle
-    </a>
-  </li>
-  <li>
-    <a 
-      href="https://leetcode.com/u/skvprogrammer"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        color: '#00ff00',
-        textDecoration: 'none',
-        transition: 'color 0.2s ease, text-shadow 0.3s ease',
-      }}
-      onMouseOver={e => {
-        e.currentTarget.style.textShadow = '0 0 5px #00ff00';
-        e.currentTarget.style.color = '#66ff66';
-      }}
-      onMouseOut={e => {
-        e.currentTarget.style.textShadow = 'none';
-        e.currentTarget.style.color = '#00ff00';
-      }}
-    >
-      Leetcode
-    </a>
-  </li>
+      <div
+        style={{ position: "fixed", inset: 0, background: t.bg, display: "flex", flexDirection: "column", fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code','Courier New',monospace", fontSize: "13.5px", color: t.text, transition: "background 0.3s,color 0.3s", overflow: "hidden" }}
+        onClick={() => inputRef.current?.focus()}
+      >
+        {/* CRT scanlines */}
+        {theme === "dark" && (
+          <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 50, background: "repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.035) 2px,rgba(0,0,0,0.035) 4px)" }} />
+        )}
 
-
-  <li>
-    <a 
-      href="https://github.com/skvprogrammer"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        color: '#00ff00',
-        textDecoration: 'none',
-        transition: 'color 0.2s ease, text-shadow 0.3s ease',
-      }}
-      onMouseOver={e => {
-        e.currentTarget.style.textShadow = '0 0 5px #00ff00';
-        e.currentTarget.style.color = '#66ff66';
-      }}
-      onMouseOut={e => {
-        e.currentTarget.style.textShadow = 'none';
-        e.currentTarget.style.color = '#00ff00';
-      }}
-    >
-      GitHub
-    </a>
-  </li>
-
-
-        
-  <li>
-    <a 
-      href="https://linktree.com/skvprogrammer"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        color: '#00ff00',
-        textDecoration: 'none',
-        transition: 'color 0.2s ease, text-shadow 0.3s ease',
-      }}
-      onMouseOver={e => {
-        e.currentTarget.style.textShadow = '0 0 5px #00ff00';
-        e.currentTarget.style.color = '#66ff66';
-      }}
-      onMouseOut={e => {
-        e.currentTarget.style.textShadow = 'none';
-        e.currentTarget.style.color = '#00ff00';
-      }}
-    >
-      Linktree
-    </a>
-  </li>
-</ul>
-
-      </TerminalHeader>
-      <TerminalBody>
-        <h3>
-          <TypeAnimation
-            sequence={[
-              "Satyam Kumar Verman! - Portfolio Terminal",
-              3000,
-              "Type 'help' to get started.",
-              2000,
-            ]}
-            wrapper="span"
-            cursor={false}
-            repeat={Infinity}
-          />
-        </h3>
-        <div>
-          {output.map((line, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {line.split("\n").map((text, idx) => (
-                <React.Fragment key={idx}>
-                  {text}
-                  <br />
-                </React.Fragment>
+        {/* HEADER */}
+        <div style={{ flexShrink: 0, background: t.headerBg, borderBottom: `1px solid ${t.border}`, padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", zIndex: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div style={{ display: "flex", gap: "7px" }}>
+              {["#ff5f57","#febc2e","#28c840"].map((c, i) => (
+                <div key={i} style={{ width: "12px", height: "12px", borderRadius: "50%", background: c, boxShadow: `0 0 5px ${c}99` }} />
               ))}
-            </motion.div>
+            </div>
+            <span style={{ color: t.headerText, fontSize: "12px", letterSpacing: "0.12em", textTransform: "uppercase", opacity: 0.85 }}>
+              satyam@portfolio: ~
+            </span>
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); setTheme((p) => (p === "dark" ? "light" : "dark")); }}
+            style={{ background: t.buttonBg, border: `1px solid ${t.border}`, borderRadius: "6px", color: t.accent, cursor: "pointer", padding: "5px 12px", fontSize: "11px", letterSpacing: "0.08em", transition: "background 0.2s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = t.buttonHover)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = t.buttonBg)}
+          >
+            {theme === "dark" ? "☀ LIGHT" : "☾ DARK"}
+          </button>
+        </div>
+
+        {/* SCROLLABLE OUTPUT */}
+        <div ref={bodyRef} style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "18px 24px 12px", lineHeight: "1.75" }}>
+          {output.map((line, i) => {
+            if (line.type === "boot") return (
+              <div key={i} style={{ color: resolveColor(line.color), opacity: 0.85, animation: "fadeSlideIn 0.2s ease" }}>
+                {line.text === "" ? <br /> : <span>{"› "}{line.text}</span>}
+              </div>
+            );
+            if (line.type === "cmd") return (
+              <div key={i} style={{ display: "flex", alignItems: "center", marginTop: "10px", flexWrap: "wrap", animation: "fadeSlideIn 0.15s ease" }}>
+                <span style={{ color: t.accent }}>root</span>
+                <span style={{ color: t.muted }}>@</span>
+                <span style={{ color: t.prompt }}>kali</span>
+                <span style={{ color: t.muted }}>:~$&nbsp;</span>
+                <span style={{ color: t.text }}>{line.text}</span>
+              </div>
+            );
+            if (line.type === "out") return (
+              <div key={i} style={{ marginTop: "4px", marginBottom: "6px", paddingLeft: "2px", animation: "fadeSlideIn 0.2s ease" }}>
+                {line.lines.map((l, j) => renderLine(l, j))}
+              </div>
+            );
+            return null;
+          })}
+          <div style={{ height: "8px" }} />
+        </div>
+
+        {/* STICKY INPUT */}
+        <div style={{ flexShrink: 0, background: t.footerBg, borderTop: `1px solid ${t.border}`, padding: "11px 24px", display: "flex", alignItems: "center", boxShadow: theme === "dark" ? "0 -1px 20px rgba(0,255,136,0.04)" : "0 -1px 8px rgba(0,0,0,0.05)" }}>
+          <span style={{ color: t.accent, fontWeight: "bold", userSelect: "none" }}>root</span>
+          <span style={{ color: t.muted, userSelect: "none" }}>@</span>
+          <span style={{ color: t.prompt, fontWeight: "bold", userSelect: "none" }}>kali</span>
+          <span style={{ color: t.muted, userSelect: "none" }}>:~$&nbsp;</span>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", minWidth: 0 }}>
+            <input
+              ref={inputRef}
+              value={command}
+              onChange={(e) => setCommand(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              disabled={!booted}
+              autoComplete="off"
+              spellCheck={false}
+              style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: t.text, fontFamily: "inherit", fontSize: "inherit", caretColor: "transparent", letterSpacing: "0.02em", minWidth: 0 }}
+            />
+            {booted && focused && <GlowCursor theme={theme} />}
+          </div>
+        </div>
+
+        {/* KEYBOARD HINTS */}
+        <div style={{ flexShrink: 0, background: t.footerBg, borderTop: `1px solid ${t.border}`, padding: "4px 24px 6px", display: "flex", gap: "20px", fontSize: "10.5px", color: t.muted, letterSpacing: "0.05em" }}>
+          {[["TAB","autocomplete"],["↑↓","history"],["ENTER","execute"]].map(([key, label]) => (
+            <span key={key}>
+              <span style={{ background: t.buttonBg, border: `1px solid ${t.border}`, borderRadius: "3px", padding: "0 5px", color: t.accent, fontSize: "10px", marginRight: "5px" }}>{key}</span>
+              {label}
+            </span>
           ))}
         </div>
-      </TerminalBody>
-      <Line>
-        <Prompt theme={theme}>root@kali</Prompt>
-        <FaChevronRight />
-        <input
-          type="text"
-          value={command}
-          onChange={(e) => setCommand(e.target.value)}
-          onKeyDown={handleCommand}
-          style={{
-            background: "transparent",
-            color: theme === "dark" ? "#ff0000" : "#333",
-            border: "none",
-            outline: "none",
-            fontWeight: "bolder",
-            flex: 1,
-          }}
-          autoFocus
-        />
-        <Cursor theme={theme} />
-      </Line>
-    </TerminalContainer>
+      </div>
+    </>
   );
-};
-
-export default Terminal;
+}
