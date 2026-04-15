@@ -237,40 +237,55 @@ export default function Terminal() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+const outputRef = useRef([]);
 
-  // Boot sequence then auto-show banner
-  useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i < BOOT_SEQUENCE.length) {
-        const idx = i;
-        const line = BOOT_SEQUENCE[idx];
-        setOutput((prev) => [
-          ...prev,
-          {
-            type: "boot",
-            text: line,
-            color: idx === BOOT_SEQUENCE.length - 1 ? "accent" : idx < 3 ? "prompt" : "muted",
-          },
-        ]);
-        i++;
-      } else {
-        clearInterval(interval);
-        const bannerOutput = { type: "out", lines: COMMANDS.banner.output };
-        setOutput((prev) => [...prev, bannerOutput]);
-        // Store persistent output (boot sequence + banner) to restore after clear
-        setPersistentOutput((prev) => [
-          ...prev,
-          ...output.map((item) => item),
-          bannerOutput,
-        ]);
-        setBooted(true);
-        setTimeout(() => inputRef.current?.focus(), 50);
-      }
-    }, 150);
-    return () => clearInterval(interval);
-  }, []);
+useEffect(() => {
+  outputRef.current = output;
+}, [output]);
 
+useEffect(() => {
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < BOOT_SEQUENCE.length) {
+      const idx = i;
+      const line = BOOT_SEQUENCE[idx];
+      setOutput((prev) => [
+        ...prev,
+        {
+          type: "boot",
+          text: line,
+          color:
+            idx === BOOT_SEQUENCE.length - 1
+              ? "accent"
+              : idx < 3
+              ? "prompt"
+              : "muted",
+        },
+      ]);
+      i++;
+    } else {
+      clearInterval(interval);
+
+      const bannerOutput = {
+        type: "out",
+        lines: COMMANDS.banner.output,
+      };
+
+      setOutput((prev) => [...prev, bannerOutput]);
+
+      setPersistentOutput((prev) => [
+        ...prev,
+        ...outputRef.current,
+        bannerOutput,
+      ]);
+
+      setBooted(true);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, 150);
+
+  return () => clearInterval(interval);
+}, []);
   // Auto-scroll
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: "smooth" });
