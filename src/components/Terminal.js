@@ -452,7 +452,7 @@ export default function Terminal() {
   const headerPadding = isMobile ? "8px 12px" : "10px 18px";
   const lineHeight = isMobile ? "1.6" : "1.75";
   const bottomPadding = isMobile ? "0px" : "12px";
-  const footerGap = isMobile ? "12px" : "20px";
+  // const footerGap = isMobile ? "12px" : "20px";
 
   return (
     <>
